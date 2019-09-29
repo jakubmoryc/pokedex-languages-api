@@ -6,11 +6,13 @@ require('dotenv').config();
 
 const app = express();
 
+// MODELS
+const Pokemon = require("./models/Pokemon");
+
 // DATABASE
 mongoose.connect(process.env.DB_URI, {useNewUrlParser: true, useUnifiedTopology: true});
 
 const db = mongoose.connection;
-
 db.once('open', () => {
     console.log("Connection to the database established");
 });
@@ -24,7 +26,9 @@ app.use(bodyParser.json());
 // ROUTES
 app.get('/', (req, res) => {
     res.json({
-        "message": "Welcome to Pokemon Languages API"
+        "message": "Welcome to Pokemon Languages API",
+        "version": "1.0.0",
+        "github": ""
     });
 });
 
