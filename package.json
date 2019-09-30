@@ -4,7 +4,7 @@
   "description": "API with Pokemon's languages",
   "main": "app.js",
   "scripts": {
-    "start": "nodemon app.js"
+    "dev": "nodemon app.js"
   },
   "keywords": [],
   "author": "Jakub Moryc",
