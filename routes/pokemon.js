@@ -4,14 +4,23 @@ const router = express.Router()
 // MODELS
 const Pokemon = require('../models/Pokemon');
 
+// ROUTES
+
 // @Route GET /pokemon/
-// @Desc Get all pokemon data (sorted)
+// @Params search, limit, offset
+// @Desc Get all pokemon data or search using a string; limit + offset
 // @Access PUBLIC
 router.get('/', (req, res) => {
-    Pokemon.find({})
+    const search = req.query.params
+    const pageOptions = {
+        page: req.query.page || 0,
+        limit: req.query.limit || 10
+    }
+    if(search) {
+        Pokemon.find({us: new RegExp(search, 'i')})
         .sort({ id: 'asc'})
-        .skip(0)
-        .limit(20)
+        .skip(pageOptions.page*pageOptions.limit)
+        .limit(pageOptions.limit)
         .then(result => {
             res.json(result);
         })
@@ -19,49 +28,73 @@ router.get('/', (req, res) => {
             res.status(500);
             console.log('ERROR:', err.message);
         });
+    } else {
+        Pokemon.find({})
+        .sort({ id: 'asc'})
+        .skip(pageOptions.page*pageOptions.limit)
+        .limit(pageOptions.limit)
+        .then(result => {
+            res.json(result);
+        })
+        .catch(err => {
+            res.status(500);
+            console.log('ERROR:', err.message);
+        });
+    }
 })
 
-// @Route GET /pokemon/:id
-// @Desc Get a specific pokemon data by id or name (sorted)
+// @Route GET /pokemon/:id(3 numbers)
+// @Desc Get a specific pokemon data by id
 // @Access PUBLIC
-router.get('/:id', (req, res) => {
+router.get('/:id([0-9][0-9]?[0-9]?)', (req, res) => {
     const { id } = req.params;
 
-    if (Number.isInteger(+id)) { //Check whether id is a pure number
-        Pokemon.findOne({id: id})
-            .then(result => {
-                if(result) {
-                    res.json(result);
-                }
-                else {
-                    res.status(404).json({
-                        msg: 'No resource found'
-                    });
-                }
-            })
-            .catch(err => {
-                res.status(500);
-                console.log('ERROR:', err.message);
-            });
-    } else {
-        Pokemon.findOne({us: { '$regex' : id, '$options' : 'i' }})
-            .sort({ id: 'asc'})
-            .then(result => {
-                if(result) {
-                    res.json(result);
-                }
-                else {
-                    res.status(404).json({
-                        msg: 'No resource found. To search a resource with only a part of its name please use /pokemon?search=stringYouWantToMatch'
-                    });
-                }
-            })
-            .catch(err => {
-                res.status(500);
-                console.log('ERROR:', err.message);
-            });
+    Pokemon.findOne({id: id})
+        .then(result => {
+            if(result) {
+                res.json(result);
+            }
+            else {
+                res.status(404).json({
+                    msg: 'No resource found with such id'
+                });
+            }
+        })
+        .catch(err => {
+            res.status(500);
+            console.log('ERROR:', err.message);
+        });
     }
-    // Pokemon.find({us: { '$regex' : id, '$options' : 'i' }})
+)
+
+// @Route GET /pokemon/:id(string)
+// @Desc Get a specific pokemon data by its name
+// @Access PUBLIC
+router.get('/:id([^13456789]+)', (req, res) => {
+    const { id } = req.params;
+    
+    Pokemon.findOne({us: new RegExp(`\\b${id}\\b`, 'i')}) //Case insensitive, exact regex match
+        .sort({ id: 'asc'})
+        .then(result => {
+            if(result) {
+                res.json(result);
+            }
+            else {
+                res.status(404).json({
+                    msg: 'No resource found. To search resources with only a part of its name please use /pokemon?search=stringYouWantToMatch'
+                });
+            }
+        })
+        .catch(err => {
+            res.status(500);
+            console.log('ERROR:', err.message);
+        });
+    }
+)
+
+module.exports = router
+
+// Pokemon.find({us: { '$regex' : id, '$options' : 'i' }})
     // .sort({ id: 'asc'})
     // .then(result => {
     //     if(result.length) {
@@ -77,6 +110,20 @@ router.get('/:id', (req, res) => {
     //     res.status(500);
     //     console.log('ERROR:', err.message);
     // });
-})
 
-module.exports = router
+// Pokemon.find({us: { '$regex' : id, '$options' : 'i' }})
+    // .sort({ id: 'asc'})
+    // .then(result => {
+    //     if(result.length) {
+    //         res.json(result);
+    //     }
+    //     else {
+    //         res.status(404).json({
+    //             msg: "No resource found"
+    //         });
+    //     }
+    // })
+    // .catch(err => {
+    //     res.status(500);
+    //     console.log('ERROR:', err.message);
+    // });
