@@ -11,16 +11,13 @@ const Pokemon = require('../models/Pokemon');
 // @Desc Get all pokemon data or search using a string; limit + offset
 // @Access PUBLIC
 router.get('/', (req, res) => {
-    const search = req.query.params
-    const pageOptions = {
-        page: req.query.page || 0,
-        limit: req.query.limit || 10
-    }
+    const { search, limit, page } = req.query
+
     if(search) {
         Pokemon.find({us: new RegExp(search, 'i')})
         .sort({ id: 'asc'})
-        .skip(pageOptions.page*pageOptions.limit)
-        .limit(pageOptions.limit)
+        .skip(+page*+limit || 0)
+        .limit(+limit || 20)
         .then(result => {
             res.json(result);
         })
@@ -31,8 +28,8 @@ router.get('/', (req, res) => {
     } else {
         Pokemon.find({})
         .sort({ id: 'asc'})
-        .skip(pageOptions.page*pageOptions.limit)
-        .limit(pageOptions.limit)
+        .skip(0)
+        .limit(20)
         .then(result => {
             res.json(result);
         })
