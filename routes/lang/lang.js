@@ -15,12 +15,17 @@ router.get('/:lang', (req, res) => {
             .then(result => {
                 if(result[lang]) {
                     res.json({
-                        [lang]: result[lang]
+                        href: req.protocol + '://' + req.get('host') + req.originalUrl,
+                        id: result.id,
+                        name: result.us,
+                        resource: {
+                            [lang]: result[lang]
+                        }
                     });
                 }
                 else {
                     res.status(404).json({
-                        msg: 'No language found'
+                        msg: 'No resource/subresource found'
                     });
                 };
             })
@@ -31,14 +36,19 @@ router.get('/:lang', (req, res) => {
     } else {
         Pokemon.findOne({us: new RegExp(`\\b${id}\\b`, 'i')}) //Case insensitive, exact regex match
             .then(result => {
-                if(result[lang]) {
+                if(result && result[lang]) {
                     res.json({
-                        [lang]: result[lang]
+                        href: req.protocol + '://' + req.get('host') + req.originalUrl,
+                        id: result.id,
+                        name: result.us,
+                        resource: {
+                            [lang]: result[lang]
+                        }
                     });
                 }
                 else {
                     res.status(404).json({
-                        msg: 'No resource found. To search resources with only a part of its name please use /pokemon?search=stringYouWantToMatch'
+                        msg: 'No resource/subresource found'
                     });
                 }
             })

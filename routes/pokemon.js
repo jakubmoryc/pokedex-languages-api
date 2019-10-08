@@ -14,15 +14,23 @@ const Pokemon = require('../models/Pokemon');
 // @Desc Get all pokemon data or search using a string; limit + page
 // @Access PUBLIC
 router.get('/', (req, res) => {
-    const { search, limit = 20, offset = 0 } = req.query
+    let { search, limit = 20, page = 0 } = req.query;
+
+    limit = +limit;
+    page = +page;
 
     if(search) {
         Pokemon.find({us: new RegExp(search, 'i')})
         .sort({ id: 'asc'})
-        .skip(+offset)
-        .limit(+limit)
+        .skip(page*limit)
+        .limit(limit)
         .then(result => {
-            res.json(result);
+            res.json({
+                count: result.length,
+                next: `https://wwww.blabla.com/pokemon?limit=${limit}&page=${page+1}`,
+                prev: (page == 0 ? null : `https://wwww.blabla.com/pokemon?limit=${limit}&offset=${page-1}`),
+                results: result
+            });
         })
         .catch(err => {
             res.status(500);
@@ -31,10 +39,15 @@ router.get('/', (req, res) => {
     } else {
         Pokemon.find({})
         .sort({ id: 'asc'})
-        .skip(+offset)
-        .limit(+limit)
+        .skip(page*limit)
+        .limit(limit)
         .then(result => {
-            res.json(result);
+            res.json({
+                count: result.length,
+                next: `https://wwww.blabla.com/pokemon?limit=${limit}&page=${page+1}`,
+                prev: (page == 0 ? null : `https://wwww.blabla.com/pokemon?limit=${limit}&page=${page-1}`),
+                results: result
+            });
         })
         .catch(err => {
             res.status(500);
@@ -52,7 +65,10 @@ router.get('/:id([0-9][0-9]?[0-9]?)', (req, res) => {
     Pokemon.findOne({id: id})
         .then(result => {
             if(result) {
-                res.json(result);
+                res.json({
+                    href: req.protocol + '://' + req.get('host') + req.originalUrl,
+                    resource: result
+                });
             }
             else {
                 res.status(404).json({
@@ -76,7 +92,10 @@ router.get('/:id([^13456789/]+)', (req, res) => {
     Pokemon.findOne({us: new RegExp(`\\b${id}\\b`, 'i')}) //Case insensitive, exact regex match
         .then(result => {
             if(result) {
-                res.json(result);
+                res.json({
+                    href: req.protocol + '://' + req.get('host') + req.originalUrl,
+                    resource: result
+                });
             }
             else {
                 res.status(404).json({
