@@ -6,6 +6,9 @@ const Pokemon = require('../../models/Pokemon');
 
 // ROUTES
 
+// @Route GET /pokemon/:id/:lang (string)
+// @Desc Get a subresource of specific pokemon id/name
+// @Access PUBLIC
 router.get('/:lang', (req, res) => {
     const { id } = req;
     const { lang } = req.params;
