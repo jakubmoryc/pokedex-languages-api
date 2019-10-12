@@ -2,6 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const cors = require('cors');
+const helmet = require('helmet')
 
 require('dotenv').config();
 
@@ -28,6 +29,8 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
     // CORS
 app.use(cors())
+    // HELMET
+app.use(helmet())
 
 // ROUTES
     // If request method is something else than GET, return 405
