@@ -27,8 +27,8 @@ router.get('/', (req, res) => {
         .then(result => {
             res.json({
                 count: result.length,
-                next: `https://wwww.blabla.com/pokemon?limit=${limit}&page=${page+1}`,
-                prev: (page == 0 ? null : `https://wwww.blabla.com/pokemon?limit=${limit}&offset=${page-1}`),
+                next: req.protocol + '://' + req.get('host') + '/pokemon' + `?limit=${limit}&page=${page+1}`,
+                prev: (page == 0 ? null : req.protocol + '://' + req.get('host') + '/pokemon' + `?limit=${limit}&page=${page-1}`),
                 results: result
             });
         })
@@ -44,8 +44,8 @@ router.get('/', (req, res) => {
         .then(result => {
             res.json({
                 count: result.length,
-                next: `https://wwww.blabla.com/pokemon?limit=${limit}&page=${page+1}`,
-                prev: (page == 0 ? null : `https://wwww.blabla.com/pokemon?limit=${limit}&page=${page-1}`),
+                next: req.protocol + '://' + req.get('host') + '/pokemon' + `?limit=${limit}&page=${page+1}`,
+                prev: (page == 0 ? null : req.protocol + '://' + req.get('host') + '/pokemon' + `?limit=${limit}&page=${page-1}`),
                 results: result
             });
         })
