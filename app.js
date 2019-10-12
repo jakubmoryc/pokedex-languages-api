@@ -47,7 +47,7 @@ app.get('/', (req, res) => {
     res.json({
         msg: 'Welcome to the Pokemon Languages API',
         version: '1.0.0',
-        github: '',
+        github: 'https://github.com/jakubmoryc/pokedex-languages-api',
         site: ''
     });
 });
